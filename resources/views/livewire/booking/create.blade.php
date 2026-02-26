@@ -1,181 +1,112 @@
-<div class="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-    <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-        <h2 class="text-2xl font-bold mb-6 text-center">Book an Appointment</h2>
+<div class="bg-white min-h-screen font-sans pb-20">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
-        <!-- Progress Bar -->
-        <div class="mb-8">
-            <div class="flex items-center justify-between">
-                <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-    <div class="sm:mx-auto sm:w-full sm:max-w-3xl">
-        <h2 class="text-center text-3xl font-extrabold text-gray-900 tracking-tight mb-8">
-            Book an Appointment
-        </h2>
-        
-        <!-- Progress Steps -->
-        <div class="mb-8">
-            <div class="flex items-center justify-between relative">
-                <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-200 -z-10 rounded-full"></div>
-                
-                @foreach (range(1, 4) as $s)
-                    <div class="flex flex-col items-center bg-gray-50 px-2">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 {{ $step >= $s ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/30 ring-4 ring-primary-50' : 'bg-white text-gray-400 border border-gray-200' }}">
-                            {{ $s }}
-                        </div>
-                        <span class="text-xs font-semibold mt-2 {{ $step >= $s ? 'text-primary-700' : 'text-gray-400' }}">
-                            {{ $s === 1 ? 'Service' : ($s === 2 ? 'Date' : ($s === 3 ? 'Details' : 'Confirm')) }}
-                        </span>
-                    </div>
-                @endforeach
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        .font-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .bg-teal-custom { background-color: #00ebd4; }
+        .text-teal-custom { color: #00ebd4; }
+        .border-teal-custom { border-color: #00ebd4; }
+    </style>
+
+    <main class="max-w-7xl mx-auto px-6 py-12">
+
+        {{-- STEP INDICATOR --}}
+        <div class="flex items-center justify-center mb-12 gap-4">
+            {{-- Step 1 --}}
+            <div class="flex items-center gap-2 {{ $currentStep == 1 ? 'bg-[#e0fffb] border-teal-custom' : 'opacity-30' }} px-5 py-2.5 rounded-xl border">
+                <span class="bg-teal-custom text-white w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black">1</span>
+                <span class="text-teal-custom text-[10px] font-black uppercase tracking-widest">Layanan</span>
+            </div>
+
+            <div class="w-10 h-px bg-gray-100"></div>
+
+            {{-- Step 2 --}}
+            <div class="flex items-center gap-2 {{ $currentStep == 2 ? 'bg-[#e0fffb] border-teal-custom' : 'opacity-30' }} px-5 py-2.5 rounded-xl border">
+                <span class="{{ $currentStep >= 2 ? 'bg-teal-custom' : 'bg-gray-100' }} text-white w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black">2</span>
+                <span class="text-gray-900 text-[10px] font-black uppercase tracking-widest">Tanggal</span>
+            </div>
+
+            <div class="w-10 h-px bg-gray-100"></div>
+
+            {{-- Step 3 --}}
+            <div class="flex items-center gap-2 {{ $currentStep == 3 ? 'bg-[#e0fffb] border-teal-custom' : 'opacity-30' }} px-5 py-2.5 rounded-xl border">
+                <span class="{{ $currentStep == 3 ? 'bg-teal-custom' : 'bg-gray-100' }} text-white w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black">3</span>
+                <span class="text-gray-900 text-[10px] font-black uppercase tracking-widest">Selesai</span>
             </div>
         </div>
 
-        <div class="bg-white py-8 px-4 shadow-xl shadow-gray-200/50 sm:rounded-2xl sm:px-10 border border-gray-100">
-            <!-- Step 1: Select Service -->
-            @if ($step === 1)
-                <div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                        <span class="w-8 h-8 rounded-lg bg-primary-100 text-primary-600 flex items-center justify-center text-sm">1</span>
-                        Select a Service
-                    </h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        @foreach ($services as $service)
-                            <div wire:click="selectService({{ $service->id }})" 
-                                 class="relative rounded-xl border p-5 cursor-pointer transition-all duration-200 flex flex-col justify-between h-full group
-                                 {{ $selectedServiceId === $service->id 
-                                    ? 'border-primary-500 ring-2 ring-primary-500 bg-primary-50' 
-                                    : 'border-gray-200 hover:border-primary-300 hover:shadow-md bg-white' }}">
-                                <div>
-                                    <div class="font-bold text-gray-900 text-lg">{{ $service->name }}</div>
-                                    <p class="text-sm text-gray-500 mt-1">{{ $service->description }}</p>
-                                </div>
-                                <div class="mt-4 flex justify-between items-center">
-                                    <span class="text-sm font-medium text-gray-500 flex items-center gap-1">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                        {{ $service->duration_minutes }} mins
-                                    </span>
-                                    <span class="text-lg font-bold text-primary-600">Rp {{ number_format($service->price, 0, ',', '.') }}</span>
-                                </div>
+        {{-- STEP 1 --}}
+        @if($currentStep == 1)
+            <div class="grid lg:grid-cols-3 gap-10">
+                <div class="lg:col-span-2 bg-white p-10 rounded-3xl shadow border">
+                    <h3 class="font-bold mb-8">Pilih Layanan</h3>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        @foreach($services as $service)
+                            <div wire:click="selectService({{ $service->id }})"
+                                class="p-6 border-2 rounded-2xl cursor-pointer transition-all {{ $selectedServiceId == $service->id ? 'border-teal-custom bg-[#f0fdfa]' : 'border-gray-100' }}">
+                                <h4 class="font-bold">{{ $service->name }}</h4>
+                                <p class="mt-2 text-sm font-bold">Rp {{ number_format($service->price, 0, ',', '.') }}</p>
                             </div>
                         @endforeach
                     </div>
                 </div>
-            @endif
 
-            <!-- Step 2: Select Date & Time -->
-            @if ($step === 2)
-                <div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                         <span class="w-8 h-8 rounded-lg bg-primary-100 text-primary-600 flex items-center justify-center text-sm">2</span>
-                        Select Date & Time
-                    </h3>
-                    <div class="grid grid-cols-1 gap-6">
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Date</label>
-                            <input wire:model.live="date" type="date" class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 py-3 px-4 text-base" min="{{ date('Y-m-d') }}">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Time Slot</label>
-                            @if ($date)
-                                <div class="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                                    @foreach ($timeSlots as $slot)
-                                        <button wire:click="selectTime('{{ $slot }}')" 
-                                                class="py-2 px-4 rounded-lg text-sm font-semibold transition-all duration-200
-                                                {{ $time === $slot 
-                                                    ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/30' 
-                                                    : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300' }}">
-                                            {{ $slot }}
-                                        </button>
-                                    @endforeach
-                                </div>
-                            @else
-                                <p class="text-sm text-gray-500 italic">Please select a date first.</p>
-                            @endif
-                        </div>
+                <div class="bg-white p-8 rounded-3xl shadow border sticky top-20">
+                    <h3 class="font-bold mb-6">Ringkasan</h3>
+                    <div class="flex justify-between text-sm">
+                        <span>Subtotal</span>
+                        <span>Rp {{ $selectedService ? number_format($selectedService->price, 0, ',', '.') : '0' }}</span>
+                    </div>
+                    <div class="mt-6 border-t pt-4 flex justify-between font-bold">
+                        <span>Total</span>
+                        <span class="text-teal-custom text-xl">Rp {{ $selectedService ? number_format($selectedService->price, 0, ',', '.') : '0' }}</span>
                     </div>
                 </div>
-            @endif
+            </div>
 
-            <!-- Step 3: Customer & Pet Details -->
-            @if ($step === 3)
-                <div>
-                     <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                         <span class="w-8 h-8 rounded-lg bg-primary-100 text-primary-600 flex items-center justify-center text-sm">3</span>
-                        Your Details
-                    </h3>
-                    
-                    <div class="space-y-6">
-                        <h4 class="font-bold text-lg text-gray-800 border-b pb-2">Customer Information</h4>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">Name</label>
-                                <input wire:model="customerName" type="text" class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 h-10 px-3">
-                                @error('customerName') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">Email</label>
-                                <input wire:model="customerEmail" type="email" class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 h-10 px-3">
-                                @error('customerEmail') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">Phone</label>
-                                <input wire:model="customerPhone" type="text" class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 h-10 px-3">
-                                @error('customerPhone') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
-
-                        <h4 class="font-bold text-lg text-gray-800 border-b pb-2 pt-4">Pet Information</h4>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">Pet Name</label>
-                                <input wire:model="petName" type="text" class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 h-10 px-3">
-                                @error('petName') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">Type</label>
-                                <select wire:model="petType" class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 h-10 px-3">
-                                    <option value="dog">Dog</option>
-                                    <option value="cat">Cat</option>
-                                    <option value="bird">Bird</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+        {{-- STEP 2 --}}
+        @elseif($currentStep == 2)
+            <div class="bg-white p-10 rounded-3xl shadow border max-w-4xl mx-auto">
+                <h3 class="font-bold mb-6 text-center">Pilih Tanggal & Waktu</h3>
+                <div class="grid grid-cols-7 gap-2 mb-8">
+                    @for($i = 1; $i <= 14; $i++)
+                        @php $dateStr = "2026-03-" . str_pad($i, 2, '0', STR_PAD_LEFT); @endphp
+                        <button wire:click="selectDate('{{ $dateStr }}')"
+                            class="p-4 rounded-xl border font-bold transition-all {{ $bookingDate == $dateStr ? 'bg-teal-custom text-white border-teal-custom shadow-lg shadow-teal-100' : 'hover:border-teal-custom' }}">
+                            {{ $i }}
+                        </button>
+                    @endfor
                 </div>
-            @endif
 
-            <!-- Button Navigation -->
-            <div class="mt-8 flex justify-between pt-6 border-t border-gray-100">
-                @if ($step > 1)
-                    <button wire:click="previousStep" class="px-6 py-2 border border-gray-300 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors">
-                        Back
-                    </button>
-                    <!-- Spacer if only Back button exists (though usually there's a next/submit) -->
-                @else
-                    <div></div> 
-                @endif
-
-                @if ($step < 3)
-                    <button wire:click="nextStep" class="px-6 py-2 bg-primary-600 text-white rounded-xl text-sm font-semibold hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 shadow-lg shadow-primary-500/30 transition-all transform hover:-translate-y-0.5">
-                        Next Step
-                    </button>
-                @else
-                    <button wire:click="submit" class="px-8 py-3 bg-primary-600 text-white rounded-xl text-base font-bold hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 shadow-lg shadow-primary-500/30 transition-all transform hover:-translate-y-0.5">
-                        Confirm Booking
-                    </button>
+                @if($bookingDate)
+                    <h3 class="font-bold mb-4 text-sm text-gray-400">JAM TERSEDIA</h3>
+                    <div class="grid grid-cols-3 gap-4">
+                        <button wire:click="selectTime('10:30')" class="p-4 border-2 rounded-xl font-bold {{ $bookingTime == '10:30' ? 'border-teal-custom text-teal-custom bg-[#f0fdfa]' : 'border-gray-50' }}">10:30 WIB</button>
+                        <button wire:click="selectTime('14:30')" class="p-4 border-2 rounded-xl font-bold {{ $bookingTime == '14:30' ? 'border-teal-custom text-teal-custom bg-[#f0fdfa]' : 'border-gray-50' }}">14:30 WIB</button>
+                    </div>
                 @endif
             </div>
-        </div>
-    </div>
-</div>f ($step === 4)
-            <div class="text-center py-10">
-                <svg class="h-16 w-16 text-green-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <h3 class="text-2xl font-bold text-gray-900 mb-2">Booking Confirmed!</h3>
-                <p class="text-gray-600 mb-6">Your appointment has been scheduled successfully. We look forward to seeing you!</p>
-                <a href="{{ route('booking') }}" class="px-4 py-2 bg-indigo-600 text-white rounded-md">Book Another</a>
+
+        {{-- STEP 3 --}}
+        @elseif($currentStep == 3)
+            <div class="max-w-2xl mx-auto text-center py-16 bg-white rounded-3xl shadow border">
+                <div class="text-5xl text-teal-custom mb-6"><i class="fas fa-check-circle"></i></div>
+                <h2 class="text-3xl font-bold mb-4">Booking Berhasil!</h2>
+                <div class="bg-gray-50 p-8 rounded-2xl mb-8 mx-10">
+                    <div class="flex justify-between mb-4">
+                        <span class="text-gray-500 italic">ID Booking</span>
+                        <span class="font-black text-xl">{{ $bookingCode }}</span>
+                    </div>
+                    <div class="flex justify-between font-bold">
+                        <span>Total Bayar</span>
+                        <span class="text-teal-custom text-xl">Rp {{ $selectedService ? number_format($selectedService->price, 0, ',', '.') : '0' }}</span>
+                    </div>
+                </div>
+                <button wire:click="resetBooking" class="px-10 py-3 bg-black text-white rounded-xl font-bold">Booking Lagi</button>
             </div>
         @endif
-    </div>
+
+    </main>
 </div>

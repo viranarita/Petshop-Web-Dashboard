@@ -1,23 +1,31 @@
 <?php
 
-use App\Livewire\Auth\Login;
-use App\Livewire\Dashboard;
 use Illuminate\Support\Facades\Route;
+use App\Models\Service;
+use App\Models\Product;
 
+// PENTING: Pastiin baris ini ada biar filenya ketemu
+use App\Livewire\Booking\Create as BookingCreate;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+// 1. BERANDA (Landing Page)
 Route::get('/', function () {
-    return redirect()->route('login');
-});
+    return view('welcome', [
+        'services' => Service::all(),
+        'products' => Product::all(),
+    ]);
+})->name('home');
 
-Route::get('/login', Login::class)->name('login')->middleware('guest');
-Route::get('/booking', \App\Livewire\Booking\Create::class)->name('booking');
-Route::get('/dashboard', Dashboard::class)->name('dashboard')->middleware('auth');
-Route::get('/customers', \App\Livewire\Customer\Index::class)->name('customers')->middleware('auth');
-Route::get('/calendar', \App\Livewire\Calendar::class)->name('calendar')->middleware('auth');
-Route::get('/pos', \App\Livewire\Pos\Terminal::class)->name('pos')->middleware('auth');
+// 2. LAYANAN (Halaman Stepper)
+// Kalau ini masih error, berarti folder App\Livewire\Booking\Create.php lo salah tempat
+Route::get('/booking', BookingCreate::class)->name('booking');
 
-Route::post('/logout', function () {
-    Auth::logout();
-    request()->session()->invalidate();
-    request()->session()->regenerateToken();
-    return redirect('/');
-})->name('logout')->middleware('auth');
+// 3. LOGIN (Biar tombol Masuk gak error)
+Route::get('/login', function() {
+    return "Halaman Login Belum Dibuat";
+})->name('login');
