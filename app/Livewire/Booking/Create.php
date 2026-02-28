@@ -2,93 +2,107 @@
 
 namespace App\Livewire\Booking;
 
-use App\Models\Booking;
-use App\Models\Customer;
-use App\Models\Pet;
 use App\Models\Service;
 use Livewire\Component;
-use Masmerise\Toaster\Toaster;
 
 class Create extends Component
 {
-    public $step = 1;
-    
-    // Step 1: Service
+    public int $currentStep = 1;
+
+    // Step 1: Service & Location
+    public ?int $selectedServiceId = null;
     public $selectedService = null;
+    public string $selectedLocation = 'Downtown Pet Spa - Jl. Jendral Sudirman No. 123';
 
-    // Step 2: Date
-    public $date;
-    public $time;
+    // Step 2: Date & Time
+    public ?string $bookingDate = null;
+    public ?string $bookingTime = null;
 
-    // Step 3: Details
-    public $customerName;
-    public $customerEmail;
-    public $customerPhone;
-    public $petName;
-    public $petType = 'dog';
-    public $petBreed;
-    public $notes;
+    // Step 3: Payment
+    public string $paymentMethod = 'virtual_account'; // 'virtual_account' | 'qris'
+    public string $selectedBank = 'bca';
 
-    public function selectService($serviceId)
+    // Step 4: Success
+    public string $bookingCode = '';
+
+    public array $locations = [
+        'Downtown Pet Spa - Jl. Jendral Sudirman No. 123',
+        'Uptown Grooming - Jl. Kemang Raya No. 45',
+        'PetPamper Selatan - Jl. TB Simatupang No. 12',
+    ];
+
+    public function selectService(int $serviceId): void
     {
+        $this->selectedServiceId = $serviceId;
         $this->selectedService = Service::find($serviceId);
-        $this->step = 2;
     }
 
-    public function selectDate()
+    public function selectDate(string $date): void
     {
-        $this->validate([
-            'date' => 'required|date|after:today',
-            'time' => 'required',
-        ]);
-        $this->step = 3;
+        $this->bookingDate = $date;
     }
 
-    public function submitBooking()
+    public function selectTime(string $time): void
     {
-        $this->validate([
-            'customerName' => 'required|string',
-            'customerEmail' => 'required|email',
-            'customerPhone' => 'required',
-            'petName' => 'required',
-            'petType' => 'required',
+        $this->bookingTime = $time;
+    }
+
+    public function setPaymentMethod(string $method): void
+    {
+        $this->paymentMethod = $method;
+    }
+
+    public function setBank(string $bank): void
+    {
+        $this->selectedBank = $bank;
+    }
+
+    public function nextStep(): void
+    {
+        if ($this->currentStep === 1 && $this->selectedServiceId) {
+            $this->currentStep = 2;
+        } elseif ($this->currentStep === 2 && $this->bookingDate && $this->bookingTime) {
+            $this->currentStep = 3;
+        } elseif ($this->currentStep === 3) {
+            $this->submitBooking();
+        }
+    }
+
+    public function prevStep(): void
+    {
+        if ($this->currentStep > 1) {
+            $this->currentStep--;
+        }
+    }
+
+    public function submitBooking(): void
+    {
+        $this->bookingCode = 'PG-' . strtoupper(substr(md5(uniqid()), 0, 6));
+        $this->currentStep = 4;
+    }
+
+    public function resetBooking(): void
+    {
+        $this->reset([
+            'currentStep', 'selectedService', 'selectedServiceId',
+            'bookingDate', 'bookingTime', 'paymentMethod', 'selectedBank', 'bookingCode',
         ]);
+        $this->currentStep = 1;
+        $this->paymentMethod = 'virtual_account';
+        $this->selectedBank = 'bca';
+        $this->selectedLocation = 'Downtown Pet Spa - Jl. Jendral Sudirman No. 123';
+    }
 
-        // Find or create customer
-        $customer = Customer::firstOrCreate(
-            ['email' => $this->customerEmail],
-            [
-                'name' => $this->customerName,
-                'phone' => $this->customerPhone,
-            ]
-        );
-
-        // Create pet
-        $pet = $customer->pets()->create([
-            'name' => $this->petName,
-            'type' => $this->petType,
-            'breed' => $this->petBreed,
-        ]);
-
-        // Create booking
-        Booking::create([
-            'customer_id' => $customer->id,
-            'pet_id' => $pet->id,
-            'service_id' => $this->selectedService->id,
-            'scheduled_at' => $this->date . ' ' . $this->time,
-            'notes' => $this->notes,
-            'status' => 'pending',
-        ]);
-
-        Toaster::success('Booking submitted successfully!');
-        
-        $this->step = 4; // Success step
+    public function getTotalProperty(): int
+    {
+        if (!$this->selectedService) return 0;
+        return (int) ($this->selectedService->price * 1.11);
     }
 
     public function render()
     {
         return view('livewire.booking.create', [
             'services' => Service::all(),
-        ])->layout('components.layouts.guest');
+        ])->layout('components.layouts.booking');
     }
 }
